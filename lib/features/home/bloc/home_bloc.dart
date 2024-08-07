@@ -3,7 +3,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter_test1/data/plates_data.dart';
+import 'package:flutter_test1/data/cart_items.dart';
+import 'package:flutter_test1/data/items_data.dart';
+import 'package:flutter_test1/data/wishlist_items.dart';
 import 'package:flutter_test1/features/home/models/home_product_data_model.dart';
 import 'package:meta/meta.dart';
 
@@ -13,6 +15,10 @@ part 'home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
     on<HomeInitialEvent>(homeInitialEvent);
+    on<HomeLaptopsEvent>(homeLaptopsEvent);
+    on<HomeIphoneEvent>(homeIphoneEvent);
+    on<HomePcEvent>(homePcEvent);
+    on<HomeTvEvent>(homeTvEvent);
     on<HomeProductWishListButtonClickedEvent>(
         homeProductWishListButtonClickedEvent);
     on<HomeProductCartButtonClickedEvent>(homeProductCartButtonClickedEvent);
@@ -20,12 +26,12 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeCartButtonNavigateEvent>(homeCartButtonNavigateEvent);
   }
 
-  Future<FutureOr<void>> homeInitialEvent(
-      HomeInitialEvent event, Emitter<HomeState> emit) async {
+  Future<FutureOr<void>> homeLaptopsEvent(
+      HomeLaptopsEvent event, Emitter<HomeState> emit) async {
     emit(HomeLoadingState());
-    await Future.delayed(Duration(seconds: 3));
-    emit(HomeLoadedSuccessState(
-        products: PlatesData.platesProducts
+    await Future.delayed(Duration(seconds: 1));
+    emit(HomeLaptopsLoadedState(
+        products: LaptopData.laptopsProducts
             .map((e) => ProductDataModel(
                 id: e['id'],
                 name: e['name'],
@@ -37,12 +43,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   FutureOr<void> homeProductWishListButtonClickedEvent(
       HomeProductWishListButtonClickedEvent event, Emitter<HomeState> emit) {
-    print('Wish List CLicked');
+    wishlistItems.add(event.clickedProduct);
+    emit(HomeProductWishListedActionState());
   }
 
   FutureOr<void> homeProductCartButtonClickedEvent(
       HomeProductCartButtonClickedEvent event, Emitter<HomeState> emit) {
-    print('Cart CLicked');
+    cartItems.add(event.clickedProduct);
+    emit(HomeProductCartedActionState());
   }
 
   FutureOr<void> homeWishListButtonNavigateEvent(
@@ -55,5 +63,53 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       HomeCartButtonNavigateEvent event, Emitter<HomeState> emit) {
     print('Cart Navigate Clicked');
     emit(HomeNavigateToCartPageActionState());
+  }
+
+  Future<FutureOr<void>> homeInitialEvent(HomeInitialEvent event, Emitter<HomeState> emit) async {
+    emit(HomeLoadingState());
+     await Future.delayed(Duration(seconds: 3));
+    emit(HomeInitialState());
+  }
+
+  Future<FutureOr<void>> homeIphoneEvent(HomeIphoneEvent event, Emitter<HomeState> emit) async {
+     emit(HomeLoadingState());
+    await Future.delayed(Duration(seconds: 1));
+    emit(HomeLaptopsLoadedState(
+        products: IphonesData.iphonesProducts
+            .map((e) => ProductDataModel(
+                id: e['id'],
+                name: e['name'],
+                description: e['description'],
+                price: e['price'],
+                imageUrl: e['imageUrl']))
+            .toList()));
+  }
+
+  Future<FutureOr<void>> homePcEvent(HomePcEvent event, Emitter<HomeState> emit) async {
+    emit(HomeLoadingState());
+    await Future.delayed(Duration(seconds: 1));
+    emit(HomeLaptopsLoadedState(
+        products: PCData.pcProducts
+            .map((e) => ProductDataModel(
+                id: e['id'],
+                name: e['name'],
+                description: e['description'],
+                price: e['price'],
+                imageUrl: e['imageUrl']))
+            .toList()));
+  }
+
+  Future<FutureOr<void>> homeTvEvent(HomeTvEvent event, Emitter<HomeState> emit) async {
+    emit(HomeLoadingState());
+    await Future.delayed(Duration(seconds: 1));
+    emit(HomeLaptopsLoadedState(
+        products: TVData.tvProducts
+            .map((e) => ProductDataModel(
+                id: e['id'],
+                name: e['name'],
+                description: e['description'],
+                price: e['price'],
+                imageUrl: e['imageUrl']))
+            .toList()));
   }
 }
